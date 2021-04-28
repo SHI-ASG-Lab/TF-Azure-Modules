@@ -280,8 +280,8 @@ module "Cisco" {
     mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
     int_subnet_id      = azurerm_subnet.intsubnet.id
     ext_subnet_id      = azurerm_subnet.extsubnet.id 
-    diag_subnet_id     = azurerm_subnet.diagsubnet.id
-    
+    diag_subnet_id     = azurerm_subnet.diagsubnet[0].id
+
     tags = local.common_tags
 }
 
