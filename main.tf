@@ -243,7 +243,7 @@ resource "azurerm_subnet_route_table_association" "extassoc" {
 # will be produced in the TF Plan.
 
 module "Fortinet" {
-    source = "./FW/Fortinet.tf"
+    source = "FW/Fortinet.tf"
     count = local.Fortinet ? 1 : 0 
 
     resource_group_name = azurerm_resource_group.main.name
@@ -257,27 +257,27 @@ module "Fortinet" {
 }
 
 module "Sophos" {
-    source = "../FW/Sophos.tf"
+    source = "./FW/Sophos"
     count = local.Sophos ? 1 : 0
 }
 
 module "Cisco" {
-    source = "../FW/CiscoFTD.tf"
+    source = "./FW/CiscoFTD"
     count = local.Cisco ? 1 : 0
 }
 
 module "Juniper" {
-    source = "../FW/Juniper.tf"
+    source = "./FW/Juniper"
     count = var.Juniper ? 1 : 0
 }
 
 module "PaloAlto" {
-    source = "../FW/PaloAlto.tf"
+    source = "./FW/PaloAlto"
     count = var.PaloAlto ? 1 : 0
 }
 
 module "Watchguard" {
-    source = "../FW/Watchguard.tf"
+    source = "./FW/Watchguard"
     count = var.Watchguard ? 1 : 0
 }
 
