@@ -85,7 +85,7 @@ resource "azurerm_virtual_machine" "CiscoFTD" {
   name                          = "CiscoFTD"
   resource_group_name           = var.resource_group_name
   location                      = var.RGlocation
-  network_interface_ids         = [azurerm_network_interface.Nic1.id, azurerm_network_interface.Nic2.id, azurerm_network_interface.Nic3.id, azurerm_network_interface.Nic4[0].id]
+  network_interface_ids         = [azurerm_network_interface.Nic1.id, azurerm_network_interface.Nic2.id, azurerm_network_interface.Nic3.id, azurerm_network_interface.Nic4.id]
   primary_network_interface_id  = azurerm_network_interface.Nic1.id
   vm_size                       = "Standard_D3_v2"
 
