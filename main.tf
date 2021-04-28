@@ -257,27 +257,27 @@ module "Fortinet" {
 }
 
 module "Sophos" {
-    source = "./FW/Sophos.tf"
+    source = "../FW/Sophos.tf"
     count = local.Sophos ? 1 : 0
 }
 
 module "Cisco" {
-    source = "./FW/CiscoFTD.tf"
+    source = "../FW/CiscoFTD.tf"
     count = local.Cisco ? 1 : 0
 }
 
 module "Juniper" {
-    source = "./FW/Juniper.tf"
+    source = "../FW/Juniper.tf"
     count = var.Juniper ? 1 : 0
 }
 
 module "PaloAlto" {
-    source = "./FW/PaloAlto.tf"
+    source = "../FW/PaloAlto.tf"
     count = var.PaloAlto ? 1 : 0
 }
 
 module "Watchguard" {
-    source = "./FW/Watchguard.tf"
+    source = "../FW/Watchguard.tf"
     count = var.Watchguard ? 1 : 0
 }
 
