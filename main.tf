@@ -243,7 +243,7 @@ resource "azurerm_subnet_route_table_association" "extassoc" {
 # will be produced in the TF Plan.
 
 module "Fortinet" {
-    source = "./FW/Fortinet.tf"
+    source = "./FW/Fortinet"
     count = local.Fortinet ? 1 : 0 
 
     resource_group_name = azurerm_resource_group.main.name
