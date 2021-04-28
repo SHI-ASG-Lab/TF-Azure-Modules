@@ -259,25 +259,70 @@ module "Fortinet" {
 module "Sophos" {
     source = "./FW/Sophos"
     count = local.Sophos ? 1 : 0
+
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
 module "Cisco" {
     source = "./FW/CiscoFTD"
     count = local.Cisco ? 1 : 0
+    
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
 module "Juniper" {
     source = "./FW/Juniper"
     count = var.Juniper ? 1 : 0
+    
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
 module "PaloAlto" {
     source = "./FW/PaloAlto"
     count = var.PaloAlto ? 1 : 0
+    
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
 module "Watchguard" {
     source = "./FW/Watchguard"
     count = var.Watchguard ? 1 : 0
+    
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
