@@ -82,10 +82,19 @@ locals {
   Watchguard = tobool(lower(var.Watchguard))
 
   common_tags = {
-    Owner = "JIsley"
-    Requestor = "?"
+    Owner       = "JIsley"
+    Requestor   = "?"
     Environment = var.RG_Env_Tag
-    SP = var.RG_SP_Name
+    SP          = var.RG_SP_Name
+  }
+  fw_variables = {
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation          = azurerm_resource_group.main.location
+    mgmt_subnet_id      = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id       = azurerm_subnet.intsubnet.id
+    ext_subnet_id       = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
   }
 }
 
@@ -243,21 +252,14 @@ resource "azurerm_subnet_route_table_association" "extassoc" {
 # will be produced in the TF Plan.
 
 module "Fortinet" {
-    source = "./FW/Fortinet"
+    source = "./modules/FW/Fortinet"
     count = local.Fortinet ? 1 : 0 
 
-    resource_group_name = azurerm_resource_group.main.name
-    RGlocation = azurerm_resource_group.main.location
-
-    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
-    int_subnet_id      = azurerm_subnet.intsubnet.id
-    ext_subnet_id      = azurerm_subnet.extsubnet.id 
-
-    tags = local.common_tags
+    local.fw_variables
 }
 
 module "Sophos" {
-    source = "./FW/Sophos"
+    source = "./modules/FW/Sophos"
     count = local.Sophos ? 1 : 0
 
     resource_group_name = azurerm_resource_group.main.name
@@ -271,7 +273,7 @@ module "Sophos" {
 }
 
 module "Cisco" {
-    source = "./FW/CiscoFTD"
+    source = "./modules/FW/CiscoFTD"
     count = local.Cisco ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
@@ -286,7 +288,7 @@ module "Cisco" {
 }
 
 module "Juniper" {
-    source = "./FW/Juniper"
+    source = "./modules/FW/Juniper"
     count = var.Juniper ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
@@ -300,7 +302,7 @@ module "Juniper" {
 }
 
 module "PaloAlto" {
-    source = "./FW/PaloAlto"
+    source = "./modules/FW/PaloAlto"
     count = var.PaloAlto ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
@@ -314,7 +316,7 @@ module "PaloAlto" {
 }
 
 module "Watchguard" {
-    source = "./FW/Watchguard"
+    source = "./modules/FW/Watchguard"
     count = var.Watchguard ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
