@@ -87,15 +87,6 @@ locals {
     Environment = var.RG_Env_Tag
     SP          = var.RG_SP_Name
   }
-  fw_variables = {
-    resource_group_name = azurerm_resource_group.main.name
-    RGlocation          = azurerm_resource_group.main.location
-    mgmt_subnet_id      = azurerm_subnet.mgmtsubnet.id
-    int_subnet_id       = azurerm_subnet.intsubnet.id
-    ext_subnet_id       = azurerm_subnet.extsubnet.id 
-
-    tags = local.common_tags
-  }
 }
 
 
@@ -255,7 +246,14 @@ module "Fortinet" {
     source = "./modules/FW/Fortinet"
     count = local.Fortinet ? 1 : 0 
 
-    local.fw_variables
+    resource_group_name = azurerm_resource_group.main.name
+    RGlocation = azurerm_resource_group.main.location
+
+    mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+    int_subnet_id      = azurerm_subnet.intsubnet.id
+    ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+    tags = local.common_tags
 }
 
 module "Sophos" {
