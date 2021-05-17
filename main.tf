@@ -73,6 +73,35 @@ variable "Watchguard" {
   type = string
   default = "false"
 }
+variable "EDR" {
+  type = string
+  default = "false"
+}
+variable "w10" {
+  type = number
+  default = 0
+}
+variable "w10snap" {
+  type = number
+  default = 0
+}
+variable "Ubuntu" {
+  type = number
+  default = 0
+}
+variable "UbuntuVMsize" {
+  type = string
+  default = "Standard_E2s_v3"
+}
+variable "Win19DC" {
+  type = number
+  default = 0
+}
+variable "Terapackets" {
+  type = string
+  default = "false"
+}
+
 locals {
   Fortinet = tobool(lower(var.Fortinet))
   Sophos = tobool(lower(var.Sophos))
@@ -81,14 +110,21 @@ locals {
   PaloAlto = tobool(lower(var.PaloAlto))
   Watchguard = tobool(lower(var.Watchguard))
 
+  EDR = tobool(lower(var.EDR))
+  snapshotEDR_URL = "/subscriptions/5ac94ae0-f68d-42bf-bcce-8ed2fd7cebb9/resourceGroups/cloud-shell-storage-southcentralus/providers/Microsoft.Compute/snapshots/EDRDemoUbuntu_v1"
+
+  snapshotW10_URL = "/subscriptions/5ac94ae0-f68d-42bf-bcce-8ed2fd7cebb9/resourceGroups/cloud-shell-storage-southcentralus/providers/Microsoft.Compute/snapshots/W10-1_Snap"
+
+  Terapackets = tobool(lower(var.Terapackets))
+  snapshotTP_URL = "/subscriptions/5ac94ae0-f68d-42bf-bcce-8ed2fd7cebb9/resourceGroups/cloud-shell-storage-southcentralus/providers/Microsoft.Compute/snapshots/TerapacketsSnap1"
+
   common_tags = {
     Owner       = "JIsley"
-    Requestor   = "?"
+    Requestor   = "AMarkell"
     Environment = var.RG_Env_Tag
     SP          = var.RG_SP_Name
   }
 }
-
 
 resource "azurerm_resource_group" "main" {
   name     = var.RG_name
@@ -146,7 +182,7 @@ resource "azurerm_subnet_network_security_group_association" "mgmtSubAssocNsg" {
   subnet_id                 = azurerm_subnet.mgmtsubnet.id
   network_security_group_id = azurerm_network_security_group.NSG1.id
 }
-###
+
 resource "azurerm_subnet_network_security_group_association" "intSubAssocNsg" {
   subnet_id                 = azurerm_subnet.intsubnet.id
   network_security_group_id = azurerm_network_security_group.NSG1.id
@@ -165,6 +201,7 @@ resource "azurerm_subnet_network_security_group_association" "diagSubAssocNsg" {
 
 # Create Route Tables and specify routes
 resource "azurerm_route_table" "mgmtRtable" {
+  #count = signum(local.Fortinet + local.Sophos + local.Cisco + local.Juniper + local.PaloAlto + local.Watchguard)
   name                          = "mgmtRouteTable"
   location                      = azurerm_resource_group.main.location
   resource_group_name           = azurerm_resource_group.main.name
@@ -185,6 +222,7 @@ resource "azurerm_route_table" "mgmtRtable" {
 }
 
 resource "azurerm_route_table" "intRtable" {
+  #count = signum(local.Fortinet + local.Sophos + local.Cisco + local.Juniper + local.PaloAlto + local.Watchguard)
   name                          = "intRouteTable"
   location                      = azurerm_resource_group.main.location
   resource_group_name           = azurerm_resource_group.main.name
@@ -205,6 +243,7 @@ resource "azurerm_route_table" "intRtable" {
 }
 
 resource "azurerm_route_table" "extRtable" {
+  #count = signum(local.Fortinet + local.Sophos + local.Cisco + local.Juniper + local.PaloAlto + local.Watchguard)
   name                          = "extRouteTable"
   location                      = azurerm_resource_group.main.location
   resource_group_name           = azurerm_resource_group.main.name
@@ -287,7 +326,7 @@ module "Cisco" {
 
 module "Juniper" {
     source = "./modules/FW/Juniper"
-    count = var.Juniper ? 1 : 0
+    count = local.Juniper ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
     RGlocation = azurerm_resource_group.main.location
@@ -301,7 +340,7 @@ module "Juniper" {
 
 module "PaloAlto" {
     source = "./modules/FW/PaloAlto"
-    count = var.PaloAlto ? 1 : 0
+    count = local.PaloAlto ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
     RGlocation = azurerm_resource_group.main.location
@@ -315,7 +354,7 @@ module "PaloAlto" {
 
 module "Watchguard" {
     source = "./modules/FW/Watchguard"
-    count = var.Watchguard ? 1 : 0
+    count = local.Watchguard ? 1 : 0
     
     resource_group_name = azurerm_resource_group.main.name
     RGlocation = azurerm_resource_group.main.location
@@ -327,3 +366,113 @@ module "Watchguard" {
     tags = local.common_tags
 }
 
+# Add in EDR Ubuntu system if desired
+
+module "EDRubuntu" {
+  source = "./modules/Servers/EDRubuntu"
+  count = local.EDR ? 1 : 0
+
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+  tags = local.common_tags
+
+  source_resource_id   = local.snapshotEDR_URL
+}
+
+# Add any number of Ubuntu servers
+module "Ubuntu" {
+  source = "./modules/Servers/Ubuntu"
+  count = var.Ubuntu
+
+  UbuntuVmName = "Ubuntu-${count.index}"
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+  ipnum = count.index + 20
+  UbuntuVMsize = var.UbuntuVMsize
+
+  tags = local.common_tags
+
+}
+
+# Add in any number of Endpoint Win10 systems from Marketplace as desired
+module "Win10" {
+  source = "./modules/Endpoint/Win10"
+  count = var.w10
+
+  w10vmName = "W10-${count.index}"
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+  tags = local.common_tags
+
+  ipnum = count.index + 10
+  
+}
+
+# Add in any number of Endpoint Win10 systems from snapshot as desired
+module "Win10snap" {
+  source = "./modules/Endpoint/Win10Snap"
+  count = var.w10snap
+
+  w10vmName = "W10-${count.index}"
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+  w10snapshot        = local.snapshotW10_URL
+  tags = local.common_tags
+
+  ipnum = count.index + 15
+  
+}
+
+# Add in any number of "Windows 2019 Datacenter" Servers
+module "Windows2019DC" {
+  source = "./modules/Servers/Windows2019DC"
+  count = var.Win19DC
+
+  VmName = "Win19-${count.index}"
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+  tags = local.common_tags
+
+  ipnum = count.index + 30
+  
+}
+
+# Add a Terapackets Server
+module "Terapackets" {
+  source = "./modules/Servers/Terapackets"
+  count = local.Terapackets ? 1 : 0
+
+  resource_group_name = azurerm_resource_group.main.name
+  RGlocation = azurerm_resource_group.main.location
+
+  mgmt_subnet_id     = azurerm_subnet.mgmtsubnet.id
+  int_subnet_id      = azurerm_subnet.intsubnet.id
+  ext_subnet_id      = azurerm_subnet.extsubnet.id 
+
+  tags = local.common_tags
+
+  source_resource_id   = local.snapshotTP_URL
+}
