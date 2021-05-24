@@ -48,14 +48,6 @@ variable "RG_SP_Name" {
   type = string
 }
 
-variable "NSG_name" {
-  type = string
-}
-
-variable "VNET_name" {
-  type = string
-}
-
 variable "mgmt_Subnet1_name" {
   type = string
   default = "mgmtSubnet"
@@ -123,6 +115,14 @@ variable "Terapackets" {
   type = string
   default = "false"
 }
+variable "Requestor" {
+  type = string
+  default = "nil"
+}
+variable "Owner" {
+  type = string
+  default = "Morpheus"
+}
 
 locals {
   Fortinet = tobool(lower(var.Fortinet))
@@ -141,8 +141,8 @@ locals {
   snapshotTP_URL = "/subscriptions/5ac94ae0-f68d-42bf-bcce-8ed2fd7cebb9/resourceGroups/cloud-shell-storage-southcentralus/providers/Microsoft.Compute/snapshots/TerapacketsSnap1"
 
   common_tags = {
-    Owner       = "JIsley"
-    Requestor   = "AMarkell"
+    Owner       = var.Owner
+    Requestor   = var.Requestor
     Environment = var.RG_Env_Tag
     SP          = var.RG_SP_Name
   }
@@ -156,14 +156,14 @@ resource "azurerm_resource_group" "main" {
 }
 
 resource "azurerm_network_security_group" "NSG1" {
-  name                = var.NSG_name
+  name                = "${var.RG_name}-NSG"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
 
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "main" {
-  name                = var.VNET_name
+  name                = "${var.RG_name}-vNet"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   address_space       = ["10.0.0.0/16"]

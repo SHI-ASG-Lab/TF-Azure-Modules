@@ -1,10 +1,9 @@
-RG_name            = "Lab-MorpheusMade-TF2"
+RG_name            = "Lab-MorpheusMade-TF3"
 RG_Env_Tag         = "Dev"
 RG_SP_Name         = "Lab"
 
-NSG_name           = "SecurityGroup1"
-
-VNET_name          = "VirtualNetwork1"
+Requestor          = "Tester"
+Owner              = "JIsley"
 
 mgmt_Subnet1_name  = "mgmtSubnet"
 int_Subnet2_name   = "internalSubnet"
@@ -32,7 +31,7 @@ w10snap            = 3
 
 # Include specific # of Ubuntu Servers
 Ubuntu             = 1
-UbuntuVMsize       = "Standard_B4ms"
+UbuntuVMsize       = "Standard_E2s_v3"
 
 # Include specific # of "Windows 2019 Datacenter" Servers
 Win19DC            = 1
