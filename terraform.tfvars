@@ -13,7 +13,7 @@ ext_Subnet3_name   = "externalSubnet"
 # Defaults are false, only one needs to be passed as true from front-end.
 # These are string inputs, and will be converted to lowercase + boolean in main.tf.
 
-Fortinet           = "True"
+Fortinet           = "false"
 Sophos             = "false"
 Cisco              = "false"
 Juniper            = "false"
@@ -27,14 +27,14 @@ EDR                = "false"
 w10                = 0
 
 # Include specific # of Endpoint Win10 systems from Snapshot
-w10snap            = 3
+w10snap            = 0
 
 # Include specific # of Ubuntu Servers
-Ubuntu             = 1
+Ubuntu             = 0
 UbuntuVMsize       = "Standard_E2s_v3"
 
 # Include specific # of "Windows 2019 Datacenter" Servers
-Win19DC            = 1
+Win19DC            = 0
 
 # Include Terapackets Server?
 Terapackets        = "False"
